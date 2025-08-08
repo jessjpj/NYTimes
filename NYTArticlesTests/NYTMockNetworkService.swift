@@ -14,7 +14,7 @@ final class NYTMockNetworkService: NYTNetworkServiceProtocol {
     var shouldReturnError = false
     var articlesToReturn: [NYTArticleModel] = []
 
-    func fetchMostViewedArticles(period: Int, page: Int) -> AnyPublisher<NYTArticleResponseModel, Error> {
+    func fetchMostViewedArticles(period: Int) -> AnyPublisher<NYTArticleResponseModel, Error> {
         if shouldReturnError {
             return Fail(error: URLError(.badServerResponse))
                 .eraseToAnyPublisher()

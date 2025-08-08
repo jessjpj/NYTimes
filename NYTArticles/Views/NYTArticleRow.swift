@@ -65,10 +65,6 @@ struct NYTArticleRow: View {
 
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-
-            Image(systemName: NYTConstants.ImageNames.chevronRightIconName)
-                .foregroundColor(NYTConstants.Colors.chevronColor)
-                .frame(alignment: .center)
         }
         .padding(.vertical, NYTConstants.Layout.cornerRadius)
     }

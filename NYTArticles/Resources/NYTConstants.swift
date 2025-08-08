@@ -23,9 +23,8 @@ enum NYTConstants {
         static let shareIconName = "square.and.arrow.up"
         static let likeIconName = "heart"
         static let likedIconName = "heart.fill"
-        static let filterIconName = "line.3.horizontal.decrease.circle"
+        static let filterIconName = "line.horizontal.3.decrease.circle"
         static let calendarIconName = "calendar"
-        static let chevronRightIconName = "chevron.right"
         static let photoPlaceholderIconName = "photo"
     }
     

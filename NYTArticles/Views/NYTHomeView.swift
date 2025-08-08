@@ -17,9 +17,6 @@ struct NYTHomeView: View {
                 ForEach(viewModel.articles, id: \.id) { article in
                     NavigationLink(value: article) {
                         NYTArticleRow(article: article)
-                            .onAppear {
-                                viewModel.loadMoreIfNeeded(current: article)
-                            }
                     }
                 }
             }

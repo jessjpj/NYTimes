@@ -8,5 +8,5 @@
 import Combine
 
 protocol NYTNetworkServiceProtocol {
-    func fetchMostViewedArticles(period: Int, page: Int) -> AnyPublisher<NYTArticleResponseModel, Error>
+    func fetchMostViewedArticles(period: Int) -> AnyPublisher<NYTArticleResponseModel, Error>
 }
