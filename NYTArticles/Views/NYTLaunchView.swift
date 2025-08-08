@@ -15,7 +15,7 @@ struct NYTLaunchView: View {
             NYTRootTabView()
         } else {
             VStack {
-                Image("AppIcon")
+                Image("AppIconImage")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 120, height: 120)
