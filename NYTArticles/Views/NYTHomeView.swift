@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NYTHomeView: View {
     @StateObject private var viewModel = NYTHomeViewModel()
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         NavigationStack {
@@ -42,7 +43,7 @@ struct NYTHomeView: View {
                 }
             }
             .navigationDestination(for: NYTArticleModel.self) { article in
-                NYTArticleDetailView(article: article)
+                NYTArticleDetailView(article: article, context: modelContext)
             }
         }
         .onAppear {

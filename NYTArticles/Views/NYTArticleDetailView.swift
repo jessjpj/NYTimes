@@ -10,37 +10,47 @@ import SwiftData
 import SDWebImageSwiftUI
 
 struct NYTArticleDetailView: View {
-    let article: NYTArticleModel
-
-    @Environment(\.modelContext) private var context
-    @Query private var likedArticles: [NYTLikedArticle]
-
-    @State private var isLiked: Bool = false
-
+    @StateObject private var viewModel: NYTArticleDetailViewModel
+    
+    init(article: NYTArticleModel, context: ModelContext) {
+        let adapter = NYTModelContextAdapter(context: context)
+        _viewModel = StateObject(wrappedValue: NYTArticleDetailViewModel(
+            article: article,
+            persistenceContext: adapter
+        ))
+    }
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: NYTConstants.Layout.contentSpacing) {
-                if let url = URL(string: article.media?.first?.mediaMetadata?.last?.url ?? "") {
-                    WebImage(url: url)
+                if let imageURL = viewModel.imageURL {
+                    WebImage(url: imageURL)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(NYTConstants.Layout.detailImageCornerRadius)
                 }
-                Text(article.title ?? "")
+                
+                Text(viewModel.title)
                     .font(NYTFonts.title)
 
-                Text(article.byline ?? "")
+                Text(viewModel.byline)
                     .font(NYTFonts.subheadline)
 
-                Text(article.abstract ?? "")
+                Text(viewModel.abstract)
                     .font(NYTFonts.body)
 
-                Button(action: toggleLike) {
-                    Label(isLiked ? NYTConstants.Strings.unlike : NYTConstants.Strings.like, systemImage: isLiked ? NYTConstants.ImageNames.likedIconName : NYTConstants.ImageNames.likeIconName)
+                Button(action: viewModel.toggleLike) {
+                    Label(viewModel.likeButtonText, systemImage: viewModel.likeButtonIcon)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(NYTConstants.Colors.likeButtonBackground)
                         .cornerRadius(NYTConstants.Layout.buttonCornerRadius)
+                }
+                
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .font(.caption)
                 }
             }
             .padding()
@@ -49,27 +59,15 @@ struct NYTArticleDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                if let urlString = article.url, let url = URL(string: urlString) {
-                    ShareLink(item: url) {
+                if let shareURL = viewModel.shareURL {
+                    ShareLink(item: shareURL) {
                         Image(systemName: NYTConstants.ImageNames.shareIconName)
                     }
                 }
             }
         }
         .onAppear {
-            isLiked = likedArticles.contains { $0.id == article.id }
-        }
-    }
-
-    private func toggleLike() {
-        if let existing = likedArticles.first(where: { $0.id == article.id }) {
-            context.delete(existing)
-            isLiked = false
-        } else {
-            let liked = NYTLikedArticle(article: article)
-            context.insert(liked)
-            isLiked = true
+            viewModel.checkIfLiked()
         }
     }
 }
-

@@ -26,7 +26,7 @@ struct NYTLikedArticlesView: View {
             }
             .navigationTitle(NYTConstants.Strings.likedTitle)
             .navigationDestination(for: NYTArticleModel.self) { article in
-                NYTArticleDetailView(article: article)
+                NYTArticleDetailView(article: article, context: modelContext)
             }
             .onAppear {
                 viewModel.loadLikedArticles()
