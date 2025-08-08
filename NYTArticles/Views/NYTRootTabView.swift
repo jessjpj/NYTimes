@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct NYTRootTabView: View {
+    @Environment(\.modelContext) private var modelContext
+    
     var body: some View {
         TabView {
             NYTHomeView()
@@ -15,7 +17,7 @@ struct NYTRootTabView: View {
                     Label("Home", systemImage: "house")
                 }
 
-            NYTLikedArticlesView()
+            NYTLikedArticlesView(context: modelContext)
                 .tabItem {
                     Label("Liked", systemImage: "heart.fill")
                 }

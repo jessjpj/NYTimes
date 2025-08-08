@@ -19,8 +19,8 @@ struct NYTLaunchView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 120, height: 120)
-                Text("NYT Articles")
-                    .font(.title)
+                Text(NYTConstants.Strings.appName)
+                    .font(NYTFonts.title)
                     .bold()
             }
             .onAppear {

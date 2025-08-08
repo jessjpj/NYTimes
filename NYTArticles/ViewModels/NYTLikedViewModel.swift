@@ -11,19 +11,17 @@ import SwiftData
 
 final class NYTLikedViewModel: ObservableObject {
     @Published var articles: [NYTArticleModel] = []
-    @Published var selectedArticle: NYTArticleModel?
 
-    private var modelContext: ModelContext
+    private let persistenceContext: NYTPersistenceContext
 
-    init(context: ModelContext) {
-        self.modelContext = context
+    init(persistenceContext: NYTPersistenceContext) {
+        self.persistenceContext = persistenceContext
         loadLikedArticles()
     }
 
     func loadLikedArticles() {
         do {
-            let fetchDescriptor = FetchDescriptor<NYTLikedArticle>(sortBy: [SortDescriptor(\.title)])
-            let likedArticles = try modelContext.fetch(fetchDescriptor)
+            let likedArticles = try persistenceContext.fetchLikedArticles()
             self.articles = likedArticles.map { NYTArticleModel(from: $0) }
         } catch {
             print("Failed to fetch liked articles:", error)

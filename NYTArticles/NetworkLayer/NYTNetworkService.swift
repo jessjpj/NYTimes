@@ -18,6 +18,10 @@ final class NYTNetworkService: NYTNetworkServiceProtocol {
     private let apiKey = NYTAPIConfiguration.shared.getAPIKey()
 
     func fetchMostViewedArticles(period: Int, page: Int) -> AnyPublisher<NYTArticleResponseModel, Error> {
+        guard let apiKey = apiKey else {
+            return Fail(error: NSError(domain: "NYTAPI", code: -1, userInfo: [NSLocalizedDescriptionKey: "API key missing"]))
+                .eraseToAnyPublisher()
+        }
         
         let urlString = "\(baseURL)/\(period).json?api-key=\(apiKey)"
         

@@ -6,70 +6,70 @@
 //
 
 import SwiftUI
-import SDWebImageSwiftUI
 import SwiftData
+import SDWebImageSwiftUI
 
 struct NYTArticleDetailView: View {
-    let article: NYTArticleModel?
-    @Environment(\ .modelContext) private var context
+    let article: NYTArticleModel
+
+    @Environment(\.modelContext) private var context
     @Query private var likedArticles: [NYTLikedArticle]
 
-    var isLiked: Bool {
-        likedArticles.contains(where: { $0.id == article?.id })
-    }
+    @State private var isLiked: Bool = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            if let url = URL(string: article?.media?.first?.mediaMetadata?.last?.url ?? "") {
-                WebImage(url: url)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .cornerRadius(12)
+        ScrollView {
+            VStack(alignment: .leading, spacing: NYTConstants.Layout.contentSpacing) {
+                if let url = URL(string: article.media?.first?.mediaMetadata?.last?.url ?? "") {
+                    WebImage(url: url)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .cornerRadius(NYTConstants.Layout.detailImageCornerRadius)
+                }
+                Text(article.title ?? "")
+                    .font(NYTFonts.title)
+
+                Text(article.byline ?? "")
+                    .font(NYTFonts.subheadline)
+
+                Text(article.abstract ?? "")
+                    .font(NYTFonts.body)
+
+                Button(action: toggleLike) {
+                    Label(isLiked ? NYTConstants.Strings.unlike : NYTConstants.Strings.like, systemImage: isLiked ? NYTConstants.ImageNames.likedIconName : NYTConstants.ImageNames.likeIconName)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(NYTConstants.Colors.likeButtonBackground)
+                        .cornerRadius(NYTConstants.Layout.buttonCornerRadius)
+                }
             }
-
-            Text(article?.title ?? "")
-                .font(.title2)
-                .bold()
-
-            Text(article?.byline ?? "")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-
-            Text(article?.abstract ?? "")
-                .font(.body)
-
-            Spacer()
-
-            Button(action: toggleLike) {
-                Label(isLiked ? "Unlike" : "Like", systemImage: isLiked ? "heart.fill" : "heart")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue.opacity(0.1))
-                    .cornerRadius(10)
-            }
+            .padding()
         }
-        .padding()
-        .navigationTitle("Details")
+        .navigationTitle(NYTConstants.Strings.detailsTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                if let urlString = article?.url, let url = URL(string: urlString) {
+                if let urlString = article.url, let url = URL(string: urlString) {
                     ShareLink(item: url) {
-                        Image(systemName: "square.and.arrow.up")
+                        Image(systemName: NYTConstants.ImageNames.shareIconName)
                     }
                 }
             }
         }
+        .onAppear {
+            isLiked = likedArticles.contains { $0.id == article.id }
+        }
     }
 
     private func toggleLike() {
-        guard let article = article else { return }
-
         if let existing = likedArticles.first(where: { $0.id == article.id }) {
             context.delete(existing)
+            isLiked = false
         } else {
             let liked = NYTLikedArticle(article: article)
             context.insert(liked)
+            isLiked = true
         }
     }
 }
+

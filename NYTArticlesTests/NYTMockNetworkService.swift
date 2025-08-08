@@ -8,6 +8,7 @@
 
 import Combine
 @testable import NYTArticles
+import Foundation
 
 final class NYTMockNetworkService: NYTNetworkServiceProtocol {
     var shouldReturnError = false
@@ -19,7 +20,7 @@ final class NYTMockNetworkService: NYTNetworkServiceProtocol {
                 .eraseToAnyPublisher()
         }
 
-        let response = NYTArticleResponse(articles: articlesToReturn)
+        let response = NYTArticleResponseModel(results: articlesToReturn)
 
         return Just(response)
             .setFailureType(to: Error.self)

@@ -16,35 +16,35 @@ struct NYTArticleRow: View {
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: NYTConstants.Layout.detailImageCornerRadius) {
             WebImage(url: imageUrl, options: [.delayPlaceholder])
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: 80, height: 80)
+                .frame(width: NYTConstants.Layout.imageSize, height: NYTConstants.Layout.imageSize)
                 .clipped()
-                .cornerRadius(8)
+                .cornerRadius(NYTConstants.Layout.cornerRadius)
                 .overlay {
                     if imageUrl == nil {
-                        Image(systemName: "photo")
+                        Image(systemName: NYTConstants.ImageNames.photoPlaceholderIconName)
                             .resizable()
                             .scaledToFit()
-                            .padding(20)
-                            .frame(width: 80, height: 80)
-                            .foregroundColor(.gray.opacity(0.5))
+                            .padding(NYTConstants.Layout.imagePadding)
+                            .frame(width: NYTConstants.Layout.imageSize, height: NYTConstants.Layout.imageSize)
+                            .foregroundColor(NYTConstants.Colors.placeholderIconColor)
                             .progressViewStyle(.circular)
                     }
                 }
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(article.title ?? "")
-                    .font(.headline)
-                    .lineLimit(2)
+                    .font(NYTFonts.headline)
+                    .lineLimit(NYTConstants.LineLimit.limit2)
 
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(article.byline ?? "")
-                            .font(.subheadline)
-                            .lineLimit(2)
+                            .font(NYTFonts.subheadline)
+                            .lineLimit(NYTConstants.LineLimit.limit2)
 
                         if let byline = article.byline, byline.count < 30 {
                             HStack {
@@ -56,20 +56,20 @@ struct NYTArticleRow: View {
                     Spacer()
 
                     HStack(spacing: 4) {
-                        Image(systemName: "calendar")
-                            .font(.caption)
+                        Image(systemName: NYTConstants.ImageNames.calendarIconName)
+                            .font(NYTFonts.caption)
                         Text(article.published_date ?? "")
-                            .font(.caption)
+                            .font(NYTFonts.caption)
                     }
                 }
 
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Image(systemName: "chevron.right")
-                .foregroundColor(.gray)
+            Image(systemName: NYTConstants.ImageNames.chevronRightIconName)
+                .foregroundColor(NYTConstants.Colors.chevronColor)
                 .frame(alignment: .center)
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, NYTConstants.Layout.cornerRadius)
     }
 }

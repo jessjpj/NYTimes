@@ -6,35 +6,28 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct NYTLikedArticlesView: View {
-    @StateObject private var viewModel = NYTLikedViewModel()
+    @Environment(\.modelContext) private var modelContext
+    @StateObject private var viewModel: NYTLikedViewModel
 
+    init(context: ModelContext) {
+        let adapter = NYTModelContextAdapter(context: context)
+        _viewModel = StateObject(wrappedValue: NYTLikedViewModel(persistenceContext: adapter))
+    }
+    
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(viewModel.articles, id: \.id) { article in
+        NavigationStack {
+            List(viewModel.articles, id: \.id) { article in
+                NavigationLink(value: article) {
                     NYTArticleRow(article: article)
-                        .onTapGesture {
-                            viewModel.selectedArticle = article
-                        }
                 }
             }
-            .navigationTitle("Liked Articles")
-            .background(
-                NavigationLink(
-                    destination: NYTArticleDetailView(article: viewModel.selectedArticle),
-                    isActive: Binding(
-                        get: { viewModel.selectedArticle != nil },
-                        set: { active in
-                            if !active { viewModel.selectedArticle = nil }
-                        }
-                    )
-                ) {
-                    EmptyView()
-                }
-                .hidden()
-            )
+            .navigationTitle(NYTConstants.Strings.likedTitle)
+            .navigationDestination(for: NYTArticleModel.self) { article in
+                NYTArticleDetailView(article: article)
+            }
             .onAppear {
                 viewModel.loadLikedArticles()
             }

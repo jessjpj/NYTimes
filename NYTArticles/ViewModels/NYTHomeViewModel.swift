@@ -15,7 +15,6 @@ class NYTHomeViewModel: ObservableObject {
     // MARK: - Published properties
     @Published private(set) var articles: [NYTArticleModel] = []
     @Published var selectedPeriod: NYTArticlePeriod = .thirtyDays
-    @Published var selectedArticle: NYTArticleModel? = nil
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String? = nil
     

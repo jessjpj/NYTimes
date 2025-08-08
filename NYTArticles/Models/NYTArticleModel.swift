@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct NYTArticleModel: Codable, Identifiable, Equatable {
+struct NYTArticleModel: Codable, Identifiable, Equatable, Hashable {
     var id: String { url ?? UUID().uuidString }
     let url: String?
     let title: String?
@@ -17,7 +17,7 @@ struct NYTArticleModel: Codable, Identifiable, Equatable {
     let media: [NYTMedia]?
 }
 
-struct NYTMedia: Codable, Equatable {
+struct NYTMedia: Codable, Equatable, Hashable {
     let mediaMetadata: [NYTMediaMetadata]?
 
     enum CodingKeys: String, CodingKey {
@@ -25,7 +25,7 @@ struct NYTMedia: Codable, Equatable {
     }
 }
 
-struct NYTMediaMetadata: Codable, Equatable {
+struct NYTMediaMetadata: Codable, Equatable, Hashable {
     let url: String?
     let format: String?
 }

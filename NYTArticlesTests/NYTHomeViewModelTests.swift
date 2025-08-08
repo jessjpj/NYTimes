@@ -14,43 +14,45 @@ final class NYTHomeViewModelTests: XCTestCase {
     var viewModel: NYTHomeViewModel!
     var mockNetworkService: NYTMockNetworkService!
     var mockCacheManager: NYTMockCacheManager!
+    private var cancellables = Set<AnyCancellable>()
 
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
         mockNetworkService = NYTMockNetworkService()
         mockCacheManager = NYTMockCacheManager()
-        viewModel = NYTHomeViewModel(networkService: mockNetworkService, cacheManager: mockCacheManager)
+        viewModel = await NYTHomeViewModel(networkService: mockNetworkService, cacheManager: mockCacheManager)
     }
 
-    func testFetchArticlesSuccess() {
+    func testFetchArticlesSuccess() async throws {
         let article = NYTArticleModel(url: "https://test.com", title: "Test Article", abstract: nil, byline: "Author", published_date: "2025-08-08", media: nil)
         mockNetworkService.articlesToReturn = [article]
 
-        let expectation = XCTestExpectation(description: "Fetch articles success")
+        let expectation = expectation(description: "Fetch articles success")
 
-        viewModel.$articles
-            .dropFirst()
-            .sink { articles in
-                XCTAssertEqual(articles.count, 1)
-                XCTAssertEqual(articles.first?.title, "Test Article")
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
+        let cancellable = await MainActor.run {
+            viewModel.$articles
+                .dropFirst()
+                .first(where: { $0.count == 1 && $0.first?.title == "Test Article" })
+                .sink { _ in
+                    expectation.fulfill()
+                }
+        }
 
-        viewModel.fetchArticles(reset: true)
+        await viewModel.fetchArticles(reset: true)
 
-        wait(for: [expectation], timeout: 1)
+        await fulfillment(of: [expectation], timeout: 1)
+        cancellable.cancel()
     }
 
-    func testLoadCachedArticles() {
+
+    func testLoadCachedArticles() async throws {
         let article = NYTArticleModel(url: "https://cached.com", title: "Cached Article", abstract: nil, byline: "Cache Author", published_date: "2025-08-08", media: nil)
         mockCacheManager.articlesToLoad = [article]
 
-        viewModel.loadCachedArticles()
+        await viewModel.loadCachedArticles()
 
-        XCTAssertEqual(viewModel.articles.count, 1)
-        XCTAssertEqual(viewModel.articles.first?.title, "Cached Article")
+        await MainActor.run {
+            XCTAssertEqual(viewModel.articles.count, 1)
+            XCTAssertEqual(viewModel.articles.first?.title, "Cached Article")
+        }
     }
-
-    private var cancellables = Set<AnyCancellable>()
 }
