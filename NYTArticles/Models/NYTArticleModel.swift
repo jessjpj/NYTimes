@@ -38,7 +38,7 @@ extension NYTArticleModel {
             abstract: likedArticle.abstract,
             byline: likedArticle.byline,
             published_date: likedArticle.published_date,
-            media: likedArticle.mediaData
+            media: likedArticle.media
         )
     }
 }
