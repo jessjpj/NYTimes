@@ -11,7 +11,7 @@ final class NYTAPIConfiguration {
     static let shared = NYTAPIConfiguration()
     private let keychainKey = Bundle.main.bundleIdentifier! + ".NYTAPIKey"
 
-    private let testAPIKey = "e4eLHDgMvtHpZjCefuL170xHilGC1C4B"
+    private let testAPIKey = "use the key from mail"
 
     private init() {
         if NYTKeychainHelper.shared.read(key: keychainKey) == nil {
