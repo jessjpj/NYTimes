@@ -1,0 +1,77 @@
+//
+//  NYTHomeView.swift
+//  NYTArticles
+//
+//  Created by Jeslin Johnson on 08/08/2025.
+//
+
+import SwiftUI
+
+enum NYTArticlePeriod: Int, CaseIterable, Identifiable {
+    case oneDay = 1
+    case sevenDays = 7
+    case thirtyDays = 30
+
+    var id: Int { rawValue }
+
+    var label: String {
+        switch self {
+        case .oneDay: return "1 Day"
+        case .sevenDays: return "7 Days"
+        case .thirtyDays: return "30 Days"
+        }
+    }
+}
+
+struct NYTHomeView: View {
+    @StateObject private var viewModel = NYTHomeViewModel()
+
+    var body: some View {
+        NavigationView {
+            List {
+                ForEach(viewModel.articles, id: \ .id) { article in
+                    NYTArticleRow(article: article)
+                        .onAppear {
+                            viewModel.loadMoreIfNeeded(current: article)
+                        }
+                        .onTapGesture {
+                            viewModel.selectedArticle = article
+                        }
+                }
+            }
+            .refreshable {
+                await viewModel.refresh()
+            }
+            .navigationTitle("Top Articles")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        ForEach(NYTArticlePeriod.allCases) { period in
+                            Button(action: {
+                                viewModel.changePeriod(to: period)
+                            }) {
+                                Label(period.label, systemImage: viewModel.selectedPeriod == period ? "checkmark" : "")
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                    }
+                }
+            }
+            .background(
+                NavigationLink(destination: NYTArticleDetailView(article: viewModel.selectedArticle), isActive: Binding(get: {
+                    viewModel.selectedArticle != nil
+                }, set: { active in
+                    if !active { viewModel.selectedArticle = nil }
+                })) {
+                    EmptyView()
+                }
+                .hidden()
+            )
+        }
+        .onAppear {
+            viewModel.loadCachedArticles()
+            viewModel.fetchArticles()
+        }
+    }
+}

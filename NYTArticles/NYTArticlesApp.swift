@@ -25,7 +25,7 @@ struct NYTArticlesApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NYTLaunchView()
         }
         .modelContainer(sharedModelContainer)
     }
